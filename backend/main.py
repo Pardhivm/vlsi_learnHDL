@@ -119,31 +119,51 @@ def clean_result(result):
     return result
 
 
+
 def collect_files(request):
     """
-    Return the list of files as plain dicts.
-    Old-style requests (design / testbench / extras) are converted.
+    Return all submitted files, including the separate testbench field.
+    Supports both modern files[] requests and legacy requests.
     """
 
+    files = []
+
     if request.files:
-        return [
+        files = [
             {"name": item.name, "code": item.code, "role": item.role}
             for item in request.files
         ]
+    else:
+        files = [
+            {"name": item.name, "code": item.code, "role": "source"}
+            for item in request.extras
+        ]
 
-    files = [
-        {"name": item.name, "code": item.code, "role": "source"}
-        for item in request.extras
-    ]
+        if request.design and request.design.strip():
+            files.append({
+                "name": "design.v",
+                "code": request.design,
+                "role": "design"
+            })
 
-    files.append({"name": "design", "code": request.design, "role": "design"})
-
+    # Add the separate testbench only if it is not already included.
     testbench = getattr(request, "testbench", "")
 
     if testbench and testbench.strip():
-        files.append({"name": "testbench", "code": testbench, "role": "testbench"})
+        has_testbench = any(
+            item.get("role") == "testbench"
+            for item in files
+        )
+
+        if not has_testbench:
+            files.append({
+                "name": "testbench.v",
+                "code": testbench,
+                "role": "testbench"
+            })
 
     return files
+
 
 
 def validate(files):

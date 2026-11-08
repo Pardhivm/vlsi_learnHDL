@@ -1119,3 +1119,4 @@ def generate_schematic(language, files):
 
     finally:
         shutil.rmtree(temp_dir, ignore_errors=True)
+        
