@@ -11,7 +11,19 @@ import {
   getPlaygroundProjects
 } from "../../utils/firestore";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8000";
+// Local development uses the local FastAPI backend.
+// Production execution remains disabled until a secure worker is configured.
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV ? "http://127.0.0.1:8000" : "");
+
+const EXECUTION_ENABLED =
+  Boolean(API_URL) &&
+  import.meta.env.VITE_EDA_EXECUTION_ENABLED !== "false" &&
+  (
+    import.meta.env.DEV ||
+    import.meta.env.VITE_EDA_EXECUTION_ENABLED === "true"
+  );
 
 const LANGUAGES = ["Verilog", "SystemVerilog", "VHDL", "TCL", "Perl"];
 const HDL_LANGUAGES = ["Verilog", "SystemVerilog", "VHDL"];
@@ -1156,6 +1168,13 @@ const handleLoadCloudProjects = async () => {
     current.files.map(({ name, code, role }) => ({ name, code, role }));
 
   const execute = async (mode) => {
+    if (!EXECUTION_ENABLED) {
+        setConsoleOutput(
+            "Online execution is temporarily unavailable while we prepare a secure execution environment."
+        );
+        return;
+    }
+
     const isCompile = mode === "compile";
 
     if (isCompile && language === "TCL") {
@@ -1371,6 +1390,10 @@ const handleLoadCloudProjects = async () => {
   ========================================= */
 
   const handleSchematic = async () => {
+        if (!EXECUTION_ENABLED) {
+        flash("RTL schematic generation is temporarily unavailable.", "error");
+        return;
+    }
 
     const sources = current.files.filter(
       (file) => file.role !== "testbench" && file.code.trim()
@@ -1934,13 +1957,13 @@ const handleLoadCloudProjects = async () => {
           <button
             className="run-button"
             onClick={handleRun}
-            disabled={isRunning}
+            disabled={isRunning || !EXECUTION_ENABLED}
             title="Ctrl + Enter"
           >
             {isRunning && activity === "Running" ? "⏳ Running..." : "▶ Run"}
           </button>
 
-          <button onClick={handleCompile} disabled={isRunning}>
+          <button onClick={handleCompile} disabled={isRunning || !EXECUTION_ENABLED}>
             ⚙ Compile
           </button>
 
@@ -1953,7 +1976,7 @@ const handleLoadCloudProjects = async () => {
         <div className="control-group">
           {hasTestbenchSupport && (
             <>
-              <button onClick={handleSchematic} disabled={isRunning}>
+              <button onClick={handleSchematic} disabled={isRunning || !EXECUTION_ENABLED}>
                 ◇ RTL Schematic
               </button>
 
