@@ -184,7 +184,12 @@ def root():
 
 @app.post("/run")
 def run_simulation(request: SimulationRequest):
-
+    return {
+        "success": False,
+        "stage": "disabled",
+        "stdout": "",
+        "stderr": "Online simulation is temporarily unavailable while we prepare a secure execution environment."
+    }
     files = collect_files(request)
     problem = validate(files)
 
