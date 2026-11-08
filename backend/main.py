@@ -1,4 +1,5 @@
 import re
+import shutil
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,7 +17,28 @@ app = FastAPI(
     title="VLSI Learn EDA Backend",
     version="1.3.0"
 )
+@app.get("/diagnostics/tools")
+def check_installed_tools():
+    tools = {
+        "iverilog": ["iverilog"],
+        "vvp": ["vvp"],
+        "ghdl": ["ghdl"],
+        "tclsh": ["tclsh", "tclsh8.6"],
+        "perl": ["perl"],
+        "yosys": ["yosys"],
+    }
 
+    results = {}
+
+    for tool, commands in tools.items():
+        results[tool] = {
+            "installed": any(shutil.which(cmd) for cmd in commands)
+        }
+
+    return {
+        "success": True,
+        "tools": results
+    }
 
 # =========================================
 # CORS
