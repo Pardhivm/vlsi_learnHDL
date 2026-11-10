@@ -34,6 +34,13 @@ const EXECUTION_ENABLED =
     import.meta.env.VITE_EDA_EXECUTION_ENABLED === "true"
   );
 
+  console.log("EDA DEBUG:", {
+  API_URL,
+  DEV: import.meta.env.DEV,
+  EXECUTION_ENV: import.meta.env.VITE_EDA_EXECUTION_ENABLED,
+  EXECUTION_ENABLED
+});
+
 const LANGUAGES = ["Verilog", "SystemVerilog", "VHDL", "TCL", "Perl"];
 const HDL_LANGUAGES = ["Verilog", "SystemVerilog", "VHDL"];
 const SCRIPT_LANGUAGES = ["TCL", "Perl"];
