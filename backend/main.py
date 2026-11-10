@@ -65,6 +65,7 @@ app.add_middleware(
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "https://vlsi-learn-hdl.vercel.app",
+        "https://vlsi-learn-9s6pwk9na-mokhamatam-pardhiv.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
