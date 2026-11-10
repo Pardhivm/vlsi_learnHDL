@@ -11,15 +11,24 @@ import {
   getPlaygroundProjects
 } from "../../utils/firestore";
 
-// Local development uses the local FastAPI backend.
-// Production execution remains disabled until a secure worker is configured.
-const API_URL =
+
+// =========================================
+// BACKEND CONFIGURATION
+// =========================================
+
+const API_URL = (
   import.meta.env.VITE_API_URL ||
-  (import.meta.env.DEV ? "http://127.0.0.1:8000" : "");
+  (import.meta.env.DEV
+    ? "http://127.0.0.1:8000"
+    : "https://vlsi-learn-api-docker.onrender.com")
+).replace(/\/+$/, "");
+
+// =========================================
+// EXECUTION CONFIGURATION
+// =========================================
 
 const EXECUTION_ENABLED =
   Boolean(API_URL) &&
-  import.meta.env.VITE_EDA_EXECUTION_ENABLED !== "false" &&
   (
     import.meta.env.DEV ||
     import.meta.env.VITE_EDA_EXECUTION_ENABLED === "true"
